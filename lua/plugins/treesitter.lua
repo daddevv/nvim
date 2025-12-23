@@ -1,11 +1,10 @@
 return {
-	"nvim-treesitter/nvim-treesitter",
-	dependencies = {
-		"nvim-treesitter/nvim-treesitter-textobjects",
-	},
-	build = ":TSUpdate",
-	config = function()
-		require("nvim-treesitter.configs").setup({
+	{
+		"nvim-treesitter/nvim-treesitter",
+		build = ":TSUpdate",
+		lazy = false,
+		main = "nvim-treesitter.configs",
+		opts = {
 			ensure_installed = {
 				"vim",
 				"lua",
@@ -21,6 +20,10 @@ return {
 			highlight = {
 				enable = true,
 			},
-		})
-	end,
+		},
+	},
+	{
+		"nvim-treesitter/nvim-treesitter-textobjects",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+	},
 }
