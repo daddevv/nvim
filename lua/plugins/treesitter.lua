@@ -32,6 +32,6 @@ return {
 		"nvim-treesitter/nvim-treesitter-textobjects",
 		lazy = false,
 		priority = 900,
-		dependencies = { { "nvim-treesitter/nvim-treesitter", lazy = false } },
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
 	},
 }
