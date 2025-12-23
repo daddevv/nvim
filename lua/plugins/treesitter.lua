@@ -3,7 +3,6 @@ return {
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		lazy = false,
-		main = "nvim-treesitter.configs",
 		opts = {
 			ensure_installed = {
 				"vim",
@@ -21,6 +20,13 @@ return {
 				enable = true,
 			},
 		},
+		config = function(_, opts)
+			local ok, configs = pcall(require, "nvim-treesitter.configs")
+			if not ok then
+				return
+			end
+			configs.setup(opts)
+		end,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter-textobjects",
