@@ -8,7 +8,6 @@ require("mason").setup({
 		"ts_ls",
 		"bashls",
 		"jsonls",
-		"prettier",
 	},
 	icons = {
 		package_installed = "✓",
@@ -29,108 +28,75 @@ require("mason-lspconfig").setup({
 	automatic_installation = true,
 })
 
--- initialize servers with default mason-lspconfig
-local lspconfig = require("lspconfig")
+local lspconfig_defaults = {
+	capabilities = vim.tbl_deep_extend(
+		"force",
+		vim.lsp.protocol.make_client_capabilities(),
+		require("cmp_nvim_lsp").default_capabilities()
+	),
+}
 
--- pyright setup
-lspconfig.pyright.setup({
-	on_attach = require("mason-lspconfig").on_attach,
-	on_init = require("mason-lspconfig").on_init,
-	capabilities = require("mason-lspconfig").capabilities,
-	cmd = { "pyright-langserver", "--stdio" },
-	filetypes = { "python" },
-	settings = {
-		python = {
-			analysis = {
-				autoSearchPaths = true,
-				diagnosticMode = "openFilesOnly",
-				useLibraryCodeForTypes = true,
+local servers = {
+	pyright = {
+		cmd = { "pyright-langserver", "--stdio" },
+		filetypes = { "python" },
+		settings = {
+			python = {
+				analysis = {
+					autoSearchPaths = true,
+					diagnosticMode = "openFilesOnly",
+					useLibraryCodeForTypes = true,
+				},
 			},
 		},
 	},
-})
-
-lspconfig.bashls.setup({
-	on_attach = require("mason-lspconfig").on_attach,
-	on_init = require("mason-lspconfig").on_init,
-	capabilities = require("mason-lspconfig").capabilities,
-})
-
-lspconfig.jsonls.setup({
-	on_attach = require("mason-lspconfig").on_attach,
-	on_init = require("mason-lspconfig").on_init,
-	capabilities = require("mason-lspconfig").capabilities,
-})
-
-lspconfig.ts_ls.setup({
-	on_attach = require("mason-lspconfig").on_attach,
-	on_init = require("mason-lspconfig").on_init,
-	capabilities = require("mason-lspconfig").capabilities,
-})
-
-lspconfig.rust_analyzer.setup({
-	on_attach = require("mason-lspconfig").on_attach,
-	on_init = require("mason-lspconfig").on_init,
-	capabilities = require("mason-lspconfig").capabilities,
-})
-
-lspconfig.gopls.setup({
-	on_attach = require("mason-lspconfig").on_attach,
-	on_init = require("mason-lspconfig").on_init,
-	capabilities = require("mason-lspconfig").capabilities,
-	cmd = { "gopls" },
-	filetypes = { "go", "gomod", "gowork", "gotmpl" },
-	single_file_support = true,
-	settings = {
-		gopls = {
-			hints = {
-				assignVariableTypes = false,
-				compositeLiteralFields = true,
-				compositeLiteralTypes = true,
-				constantValues = true,
-				functionTypeParameters = true,
-				parameterNames = true,
-				rangeVariableTypes = true,
+	bashls = {},
+	jsonls = {},
+	ts_ls = {},
+	rust_analyzer = {},
+	gopls = {
+		cmd = { "gopls" },
+		filetypes = { "go", "gomod", "gowork", "gotmpl" },
+		single_file_support = true,
+		settings = {
+			gopls = {
+				hints = {
+					assignVariableTypes = false,
+					compositeLiteralFields = true,
+					compositeLiteralTypes = true,
+					constantValues = true,
+					functionTypeParameters = true,
+					parameterNames = true,
+					rangeVariableTypes = true,
+				},
 			},
 		},
 	},
-})
-
-lspconfig.lua_ls.setup({
-	on_attach = require("mason-lspconfig").on_attach,
-	on_init = require("mason-lspconfig").on_init,
-	capabilities = require("mason-lspconfig").capabilities,
-	cmd = { "lua-language-server" },
-	filetypes = { "lua" },
-	single_file_support = true,
-	settings = {
-		Lua = {
-			diagnostics = {
-				globals = { "vim" },
-			},
-			workspace = {
-				library = vim.api.nvim_get_runtime_file("", true),
-				checkThirdParty = false,
-			},
-			runtime = {
-				version = "LuaJIT",
+	lua_ls = {
+		cmd = { "lua-language-server" },
+		filetypes = { "lua" },
+		single_file_support = true,
+		settings = {
+			Lua = {
+				completion = {
+					callSnippet = "Replace",
+				},
+				diagnostics = {
+					globals = { "vim" },
+				},
+				workspace = {
+					library = vim.api.nvim_get_runtime_file("", true),
+					checkThirdParty = false,
+				},
+				runtime = {
+					version = "LuaJIT",
+				},
 			},
 		},
 	},
-})
+}
 
-lspconfig.prettier.setup({
-	on_attach = require("mason-lspconfig").on_attach,
-	on_init = require("mason-lspconfig").on_init,
-	capabilities = require("mason-lspconfig").capabilities,
-	cmd = { "prettier" },
-	filetypes = { "javascript", "typescript", "html", "css", "json" },
-	single_file_support = true,
-	settings = {
-		prettier = {
-			semi = true,
-			singleQuote = true,
-			trailingComma = "all",
-		},
-	},
-})
+for server_name, server_config in pairs(servers) do
+	vim.lsp.config(server_name, vim.tbl_deep_extend("force", {}, lspconfig_defaults, server_config))
+	vim.lsp.enable(server_name)
+end
