@@ -11,7 +11,7 @@ return {
 		{ "tamago324/telescope-openbrowser.nvim" },
 		{ "tyru/open-browser.vim" },
 	},
-	setup = function()
+	config = function()
 		local telescope = require("telescope")
 		local actions = require("telescope.actions")
 		local action_state = require("telescope.actions.state")
